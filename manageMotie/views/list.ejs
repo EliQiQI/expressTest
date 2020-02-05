@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>main</title>
+    <link rel="stylesheet" href="/css/reset.min.css">
+    <link rel='stylesheet' href='/css/list.min.css' />
+    <link rel="stylesheet" href="/layui-v2.5.5/layui/css/layui.css" media="all">
+</head>
+
+<body>
+    这是main页面
+    <div class="pos-f-t">
+        <div class="collapse" id="navbarToggleExternalContent">
+            <div class="bg-skyblue p-4">
+                <h5 class="text-white h4">欢迎来到你的空间</h5>
+                <span class="text-muted">常来转转</span>
+            </div>
+        </div>
+        <nav class="navbar navbar-dark bg-skyblue">
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div id="lists">
+                <span class="active">我的主页</span>
+                <span>个人主页</span>
+                <span>好友</span>
+                <span>游戏</span>
+                <span>装扮</span>
+            </div>
+
+        </nav>
+        <div class="main">
+            <div  style="display: block;">
+                <h5>我的主页</h5>
+                <table class="layui-hide" id="test" lay-filter="test"></table>
+
+                <script type="text/html" id="toolbarDemo">
+                    <div class="layui-btn-container">
+                        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+                        <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+                        <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>
+                    </div>
+                </script>
+                <script type="text/html" id="barDemo">
+                    <a class="layui-btn layui-btn-xs" lay-event="detail">查看</a>
+                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                </script>
+                <script src="/layui-v2.5.5/layui/layui.js" charset="utf-8"></script>
+                <script>
+                    layui.use('table', function () {
+                        var table = layui.table;
+
+                        table.render({
+                            elem: '#test',
+                            height: 500,
+                            url: '/list/mypage',
+                            page: true,
+                            cols: [
+                                [ //表头
+                                    {
+                                        type: 'checkbox',
+                                        fixed: 'left'
+                                    }, {
+                                        field: 'msg',
+                                        title: '信息',
+                                        width: 300,
+                                        fixed: 'left',
+                                        unresize: true,
+                                        edit:'text',
+                                        totalRowText: '合计'
+                                    }, {
+                                        field: 'msgAuthor',
+                                        title: '用户名',
+                                        width: 120,
+                                        edit: 'text'
+                                    }, {
+                                        field: 'likeNum',
+                                        title: '积分',
+                                        width: 80,
+                                        sort: true,
+                                        totalRow: true
+                                    }, {
+                                        field: 'yourPic',
+                                        title: '图片',
+                                        width: 120,
+                                        totalRow: true
+                                    }, {
+                                        fixed: 'right',
+                                        title: '操作',
+                                        toolbar: '#barDemo',
+                                        width: 200
+                                    }
+
+                                ]
+                            ]
+                        });
+
+                        //工具栏事件
+                        table.on('toolbar(test)', function (obj) {
+                            var checkStatus = table.checkStatus(obj.config.id);
+                            switch (obj.event) {
+                                case 'getCheckData':
+                                    var data = checkStatus.data;
+                                    layer.alert(JSON.stringify(data));
+                                    break;
+                                case 'getCheckLength':
+                                    var data = checkStatus.data;
+                                    layer.msg('选中了：' + data.length + ' 个');
+                                    break;
+                                case 'isAll':
+                                    layer.msg(checkStatus.isAll ? '全选' : '未全选')
+                                    break;
+                            };
+                        });
+
+                        //监听工具条 
+                        table.on('tool(test)', function (
+                            obj) { //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+                            var data = obj.data; //获得当前行数据
+                            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                            var tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+                            if (layEvent === 'detail') { //查看
+                                //do somehing
+                                new List(data).pop2();
+                            } else if (layEvent === 'del') { //删除
+                                layer.confirm('真的删除行么', function (index) {
+                                    obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                                    layer.close(index);
+                                    //向服务端发送删除指令
+                                    $.ajax({
+                                        type: 'post',
+                                        url: '/list/delete',
+                                        data: data,
+                                        success: function (data) {
+                                        }
+                                    })
+                                });
+                            } else if (layEvent === 'edit') { //编辑
+                                //do something
+                                //TODO:加模态框
+                                console.log(data);
+                                new List(data).init();
+                                //同步更新缓存对应的值
+                                obj.update({
+                                    username: '123',
+                                    title: 'xxx'
+                                });
+                            } else if (layEvent === 'LAYTABLE_TIPS') {
+                                layer.alert('Hi，头部工具栏扩展的右侧图标。');
+                            }
+                        });
+                    });
+                </script>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong"
+                    id="addmsg">
+                    点这里添加内容
+                </button>
+
+
+            </div>
+            <div>个人主页
+            </div>
+            <div>好友
+
+            </div>
+            <div>游戏</div>
+            <div>装扮</div>
+        </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+    </script>
+    <script src="/js/list.js"></script>
+    <script src="/js/list2.js"></script>
+</body>
+
+</html>

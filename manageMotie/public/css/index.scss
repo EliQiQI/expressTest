@@ -1,0 +1,105 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    background-image: url("../img/user/download.jpg");
+    background-size: 208% 100%;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    animation: backgroundmove 40s infinite;
+    position: relative;
+
+    #login {
+        width: 300px;
+
+        padding: 30px;
+        background: #ddd;
+        background-color: rgba(221, 221, 221, 0.3);
+        border-radius: 10px;
+
+        h2 {
+            padding: 20px;
+            text-align: center;
+        }
+
+        position: absolute;
+        left: 61.8%;
+        bottom:61.8%;
+        transform:translateY(50%);
+
+        &>h2 {
+            color: #fff;
+        }
+
+        &>form label {
+            color: #fff;
+        }
+
+        &>form input {
+            width: 100%;
+        }
+
+        &>form input:nth-of-type(2) {
+            width: 50%;
+        }
+
+        #change-reg {
+            color: #fff;
+        }
+    }
+
+    #register {
+        width: 300px;
+
+        padding: 30px;
+        background: #ddd;
+        background-color: rgba(221, 221, 221, 0.3);
+        border-radius: 10px;
+        display:none;
+        h2 {
+            padding: 20px;
+            text-align: center;
+        }
+
+        position: absolute;
+        left: 61.8%;
+        bottom:61.8%;
+        transform:translateY(50%);
+
+        &>h2 {
+            color: #fff;
+        }
+
+        &>form label {
+            color: #fff;
+        }
+
+        &>form input {
+            width: 100%;
+        }
+
+        &>form input:nth-of-type(2) {
+            width: 50%;
+        }
+
+        #change-log {
+            color: #fff;
+        }
+    }
+}
+
+@keyframes backgroundmove {
+    0% {
+        background-position: 0 0
+    }
+
+    50% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
+}
